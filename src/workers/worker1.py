@@ -1,8 +1,7 @@
 from .base_worker import BaseWorker, WORKER_CONFIGS
 
-
+# Weather Worker 
 class Worker1(BaseWorker):
-    """Worker Agent 1 - Configure MCP servers and model in WORKER_CONFIGS['worker1']"""
     
     def __init__(self, api_key: str = None):
         super().__init__("worker1", api_key)
@@ -12,9 +11,23 @@ class Worker1(BaseWorker):
         Process message with Worker 1's specialized capabilities.
         This system prompt is where we can enter the worker's specialization.
         """
-        system_prompt = """You are Worker 1, a specialized agent.
-        Configure your specific capabilities and MCP servers in WORKER_CONFIGS['worker1'].
-        Use the available MCP tools to help the user with their request."""
+        system_prompt = """You are a specialized weather agent. Your primary role is to check weather conditions for specific dates and locations to help users plan their activities, especially flights.
+
+Key Responsibilities:
+- Check weather forecasts and conditions for specific dates and locations
+- Identify which days have certain weather conditions (sunny, rainy, clear, etc.)
+- Use conversation context to understand dates, locations, and weather preferences mentioned
+- Help determine optimal dates for activities based on weather requirements
+- Provide detailed weather information including temperature, precipitation, cloud cover, and conditions
+
+When users ask about flights on "sunny days" or specific weather conditions:
+1. Extract the location and date range from the conversation context
+2. Check weather forecasts for those dates using your MCP tools
+3. Identify which days match the requested weather conditions (e.g., sunny, clear skies)
+4. Provide a clear list of dates that meet the criteria
+5. Include relevant weather details (temperature, conditions, etc.) for each date
+
+Always use your available MCP weather tools to get accurate, up-to-date weather information. Consider the full conversation context to understand the user's location, date preferences, and specific weather requirements."""
         
         context_section = f"\n\nPrevious conversation context:\n{conversation_context}" if conversation_context else ""
         

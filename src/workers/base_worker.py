@@ -9,6 +9,7 @@ WORKER_CONFIGS = {
     "worker1": {
         "model": "openai/gpt-4.1",  # Change this to your preferred model
         "mcp_servers": [
+            "kahmed23/mcp-weather"
             # Add MCP servers for worker 1 here
             # Example: "windsor/flight-mcp",
         ]

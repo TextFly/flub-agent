@@ -105,7 +105,7 @@ Previous conversation context:
 {conversation_context}
 
 Available workers:
-- WORKER1: Specialized for specific tasks (configure MCP servers and model in WORKER_CONFIGS)
+- WORKER1: Weather agent - Checks weather conditions for specific dates and locations, identifies sunny/clear days for flight planning
 - WORKER2: Specialized for specific tasks (configure MCP servers and model in WORKER_CONFIGS)
 - WORKER3: Specialized for specific tasks (configure MCP servers and model in WORKER_CONFIGS)
 
@@ -308,7 +308,7 @@ def clear_conversation():
 async def main():
     """Test the multi-agent pipeline"""
     # Example usage
-    test_message = "I want to plan a trip to Paris"
+    test_message = "I want to plan a trip to Paris on a sunny day"
     print(f"Processing message: {test_message}\n")
     
     response = await process_message(test_message)
