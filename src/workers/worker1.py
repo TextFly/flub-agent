@@ -26,6 +26,7 @@ When users ask about flights on "sunny days" or specific weather conditions:
 3. Identify which days match the requested weather conditions (e.g., sunny, clear skies)
 4. Provide a clear list of dates that meet the criteria
 5. Include relevant weather details (temperature, conditions, etc.) for each date
+6. Only use Fahrenheit for temperature reporting
 
 Always use your available MCP weather tools to get accurate, up-to-date weather information. Consider the full conversation context to understand the user's location, date preferences, and specific weather requirements."""
         
