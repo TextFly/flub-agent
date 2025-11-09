@@ -17,6 +17,7 @@ WORKER_CONFIGS = {
     "worker2": {
         "model": "xai/grok-2",  # Change this to your preferred model
         "mcp_servers": [
+            "bolaji/X-mcp"
             # Add MCP servers for worker 2 here
             # Example: "windsor/hotel-mcp",
         ]
