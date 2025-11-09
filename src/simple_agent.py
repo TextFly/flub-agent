@@ -149,21 +149,6 @@ class SimpleFlubAgent:
                 }
             },
             {
-                "name": "search_trending_topics",
-                "description": "Get current trending topics on X/Twitter for a specific location. Returns top trending hashtags and topics with tweet volumes.",
-                "input_schema": {
-                    "type": "object",
-                    "properties": {
-                        "woeid": {
-                            "type": "integer",
-                            "description": "Where On Earth ID for location. Common values: 1=Worldwide, 23424977=USA, 2459115=NYC, 2487956=San Francisco",
-                            "default": 1
-                        }
-                    },
-                    "required": []
-                }
-            },
-            {
                 "name": "analyze_tweet_sentiment",
                 "description": "Analyze engagement metrics and sentiment from tweet search results. Takes the output from search_topics or search_user_tweets and provides aggregated statistics.",
                 "input_schema": {
