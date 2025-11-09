@@ -11,6 +11,7 @@ from .x_api import (
     search_topics,
     analyze_tweet_sentiment
 )
+from .weather import check_weather
 
 __all__ = [
     # Flight search tools
@@ -25,5 +26,7 @@ __all__ = [
     'search_user_tweets',
     'search_trending_topics',
     'search_topics',
-    'analyze_tweet_sentiment'
+    'analyze_tweet_sentiment',
+    # Weather tools
+    'check_weather'
 ]

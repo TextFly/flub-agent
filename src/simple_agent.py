@@ -20,7 +20,8 @@ from .tools import (
     search_user_tweets,
     search_trending_topics,
     search_topics,
-    analyze_tweet_sentiment
+    analyze_tweet_sentiment,
+    check_weather
 )
 
 
@@ -176,6 +177,20 @@ class SimpleFlubAgent:
                     },
                     "required": ["tweets_data"]
                 }
+            },
+            {
+                "name": "check_weather",
+                "description": "Get current weather information for a specific city. Returns temperature, conditions, and other weather data.",
+                "input_schema": {
+                    "type": "object",
+                    "properties": {
+                        "city": {
+                            "type": "string",
+                            "description": "The name of the city to check weather for (e.g., 'London', 'New York', 'Tokyo')"
+                        }
+                    },
+                    "required": ["city"]
+                }
             }
         ]
 
@@ -193,6 +208,8 @@ class SimpleFlubAgent:
             return search_trending_topics(**tool_input)
         elif tool_name == "analyze_tweet_sentiment":
             return analyze_tweet_sentiment(**tool_input)
+        elif tool_name == "check_weather":
+            return check_weather(**tool_input)
         else:
             return {"error": f"Unknown tool: {tool_name}"}
 
