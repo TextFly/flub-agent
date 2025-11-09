@@ -31,8 +31,8 @@ WORKER_CONFIGS = {
 }
 
 
-class BaseWorker:
-    """Base class for worker agents with common functionality"""
+class BrowserAgent:
+    """BrowserAgent (previously BaseWorker) — common functionality for worker agents."""
     
     def __init__(self, worker_name: str, api_key: str = None):
         self.worker_name = worker_name

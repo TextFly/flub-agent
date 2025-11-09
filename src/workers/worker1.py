@@ -1,7 +1,7 @@
-from .base_worker import BaseWorker, WORKER_CONFIGS
+from .browser_agent import BrowserAgent, WORKER_CONFIGS
 
 # Weather Worker 
-class Worker1(BaseWorker):
+class Worker1(BrowserAgent):
     
     def __init__(self, api_key: str = None):
         super().__init__("worker1", api_key)

@@ -1,7 +1,7 @@
-from .base_worker import BaseWorker, WORKER_CONFIGS
+from .browser_agent import BrowserAgent, WORKER_CONFIGS
 
 
-class Worker3(BaseWorker):
+class Worker3(BrowserAgent):
     """Worker Agent 3 - Configure MCP servers and model in WORKER_CONFIGS['worker3']"""
     
     def __init__(self, api_key: str = None):
