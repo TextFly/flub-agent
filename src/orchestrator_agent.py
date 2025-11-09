@@ -2,7 +2,7 @@ import asyncio
 import os
 from dedalus_labs import AsyncDedalus, DedalusRunner
 from dotenv import load_dotenv
-from workers import WeatherAgent, Worker2, Worker3
+from workers import WeatherAgent, XAgent, FlightsAgent
 
 load_dotenv()
 
@@ -42,9 +42,9 @@ class OrchestratorAgent:
         
         # Initialize worker agents
         # keep attribute name `worker1` for backward compatibility with routing keys
-        self.worker1 = WeatherAgent(api_key=self.api_key)
-        self.worker2 = Worker2(api_key=self.api_key)
-        self.worker3 = Worker3(api_key=self.api_key)
+        self.weather_agent = WeatherAgent(api_key=self.api_key)
+        self.x_agent = XAgent(api_key=self.api_key)
+        self.flight_agent = FlightsAgent(api_key=self.api_key)
     
     def _get_conversation_context(self, max_messages: int = 10) -> str:
         history = self.context["conversation_history"]
@@ -89,19 +89,11 @@ Available workers:
 
 Current user message: {message}
 
-You can respond with:
-- A single worker: WORKER1, WORKER2, or WORKER3
-- Multiple workers (comma-separated): WORKER1,WORKER2 or WORKER1,WORKER2,WORKER3
-- UNKNOWN if you cannot determine
+Always respond with all 3 workers!
 
 If the message requires multiple perspectives or different types of information, use multiple workers.
 If the message is unclear or doesn't fit any worker, respond with UNKNOWN.
 Consider the conversation context when making your decision.
-
-Examples:
-- Simple query: "WORKER1"
-- Complex query needing multiple perspectives: "WORKER1,WORKER2"
-- Very complex query: "WORKER1,WORKER2,WORKER3"
 """
 
         try:
@@ -116,9 +108,9 @@ Examples:
             
             valid_workers = []
             worker_map = {
-                "WORKER1": self.worker1,
-                "WORKER2": self.worker2,
-                "WORKER3": self.worker3
+                "WORKER1": self.weather_agent,
+                "WORKER2": self.x_agent,
+                "WORKER3": self.flight_agent
             }
             
             for worker_name in selected_workers:
@@ -243,7 +235,7 @@ def clear_conversation():
 
 async def main():
     """Test the multi-agent pipeline"""
-    test_message = "I want to plan a trip to Paris on a sunny day"
+    test_message = "I want to plan a trip from NYC to Sanfransisco next week. Which flight should I get?"
     print(f"Processing message: {test_message}\n")
     
     response = await process_message(test_message)
