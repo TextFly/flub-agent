@@ -79,6 +79,20 @@ class SimpleFlubAgent:
                 }
             },
             {
+                "name": "check_weather",
+                "description": "Get current weather information for a specific city. Returns temperature, conditions, and other weather data.",
+                "input_schema": {
+                    "type": "object",
+                    "properties": {
+                        "city": {
+                            "type": "string",
+                            "description": "The name of the city to check weather for (e.g., 'London', 'New York', 'Tokyo')"
+                        }
+                    },
+                    "required": ["city"]
+                }
+            },
+            {
                 "name": "find_best_price",
                 "description": "Find the cheapest flight option for a specific route and date. Returns the single cheapest flight with price comparisons.",
                 "input_schema": {
@@ -161,20 +175,6 @@ class SimpleFlubAgent:
                         }
                     },
                     "required": ["tweets_data"]
-                }
-            },
-            {
-                "name": "check_weather",
-                "description": "Get current weather information for a specific city. Returns temperature, conditions, and other weather data.",
-                "input_schema": {
-                    "type": "object",
-                    "properties": {
-                        "city": {
-                            "type": "string",
-                            "description": "The name of the city to check weather for (e.g., 'London', 'New York', 'Tokyo')"
-                        }
-                    },
-                    "required": ["city"]
                 }
             }
         ]
