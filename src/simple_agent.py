@@ -20,7 +20,8 @@ from .tools import (
     search_user_tweets,
     search_trending_topics,
     search_topics,
-    analyze_tweet_sentiment
+    analyze_tweet_sentiment,
+    check_weather
 )
 
 
@@ -161,6 +162,20 @@ class SimpleFlubAgent:
                     },
                     "required": ["tweets_data"]
                 }
+            },
+            {
+                "name": "check_weather",
+                "description": "Get current weather information for a specific city. Returns temperature, conditions, and other weather data.",
+                "input_schema": {
+                    "type": "object",
+                    "properties": {
+                        "city": {
+                            "type": "string",
+                            "description": "The name of the city to check weather for (e.g., 'London', 'New York', 'Tokyo')"
+                        }
+                    },
+                    "required": ["city"]
+                }
             }
         ]
 
@@ -178,6 +193,8 @@ class SimpleFlubAgent:
             return search_trending_topics(**tool_input)
         elif tool_name == "analyze_tweet_sentiment":
             return analyze_tweet_sentiment(**tool_input)
+        elif tool_name == "check_weather":
+            return check_weather(**tool_input)
         else:
             return {"error": f"Unknown tool: {tool_name}"}
 
@@ -251,6 +268,14 @@ CRITICAL RULES - FOLLOW EXACTLY:
    - Assume user is on mobile
    - Don't over-explain
    - If no flights found, say so simply
+   - Match the user's message style: if they send a short message like "whats the date" or "hi", respond with a similarly brief, human reply
+
+   Examples:
+   User: "whats the date"
+   You: "It's November 9, 2025"
+
+   User: "hi"
+   You: "Hey! Need help finding flights?"
 
 Example good response:
 "I found 3 flights from LAX to JFK on Dec 15:
