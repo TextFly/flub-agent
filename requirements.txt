@@ -1,4 +1,6 @@
 anthropic
 python-dotenv
 fast-flights>=2.2
+flask
+flask-cors
 

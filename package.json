@@ -1,0 +1,17 @@
+{
+  "name": "flub-agent",
+  "version": "1.0.0",
+  "description": "Travel planning assistant with iMessage integration",
+  "type": "module",
+  "scripts": {
+    "watch": "bun run imessage-watcher.ts",
+    "api": "python agent_server.py",
+    "test": "python main.py"
+  },
+  "dependencies": {
+    "@photon-ai/imessage-kit": "latest"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  }
+}

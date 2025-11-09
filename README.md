@@ -19,6 +19,7 @@ Flub Agent is a simple, powerful travel planning assistant that uses Claude's na
 ### Prerequisites
 - Python 3.10+
 - An Anthropic API key
+- (Optional) Bun or Node.js for iMessage integration
 
 ### Installation
 
@@ -29,7 +30,11 @@ cd flub-agent
 
 2. **Install dependencies**
 ```bash
+# Python dependencies
 pip install -r requirements.txt
+
+# Optional: For iMessage integration
+bun install
 ```
 
 3. **Set up environment variables**
@@ -40,7 +45,11 @@ ANTHROPIC_API_KEY=your_anthropic_api_key_here
 
 4. **Run the agent**
 ```bash
+# Test the agent
 python main.py
+
+# Or start the API server for iMessage integration
+python agent_server.py
 ```
 
 ## Usage
@@ -84,10 +93,15 @@ flub-agent/
 │   └── tools/                 # Tool functions
 │       ├── __init__.py
 │       └── flight_search.py   # Flight search tools
-├── main.py                    # Main entry point
+├── main.py                    # Test/demo entry point
+├── agent_server.py            # HTTP API server for iMessage integration
+├── imessage-watcher.ts        # TypeScript iMessage watcher
 ├── requirements.txt           # Python dependencies
+├── package.json               # Node dependencies
 ├── .env                       # Environment variables (create this)
-└── README.md                  # This file
+├── README.md                  # This file
+├── CONVERTING_MCPS.md         # Guide for converting MCP servers
+└── IMESSAGE_SETUP.md          # iMessage integration guide
 ```
 
 ## Architecture
@@ -181,6 +195,21 @@ SimpleFlubAgent(api_key: Optional[str] = None)
 **Methods:**
 - `process(message: str) -> str`: Process a message and return response
 - `clear_history()`: Clear conversation history
+
+## iMessage Integration
+
+Want to respond to text messages automatically? Check out [`IMESSAGE_SETUP.md`](IMESSAGE_SETUP.md)!
+
+**Quick start:**
+```bash
+# Terminal 1: Start the API server
+python agent_server.py
+
+# Terminal 2: Start the iMessage watcher
+bun run watch
+```
+
+Now text your Mac: "What's the best flight from EWR to LAX tomorrow?"
 
 ## Examples
 
