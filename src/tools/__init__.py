@@ -16,6 +16,11 @@ __all__ = [
     # Flight search tools
     'search_flights',
     'find_best_price',
+    'parse_price',
+    'calculate_price_range',
+    'find_shortest_duration',
+    'compare_flight_options',
+    'filter_flights_by_criteria',
     # X API tools
     'search_user_tweets',
     'search_trending_topics',
