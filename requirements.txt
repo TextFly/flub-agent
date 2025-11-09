@@ -1,3 +1,4 @@
-dedalus_labs
+anthropic
 python-dotenv
+fast-flights>=2.2
 

@@ -1,79 +1,46 @@
-# Flub Agent - Multi-Agent Orchestration System
+# Flub Agent - Simple Travel Planning Assistant
 
-A sophisticated multi-agent system with intelligent routing, parallel processing, and automated quality evaluation through a JudgeAgent.
+A clean, single-agent travel planning system built with **Claude API** and **direct tool integration** (no MCP needed!).
 
 ## Overview
 
-The Flub Agent system consists of:
-- **OrchestratorAgent**: Routes messages to appropriate worker agents and synthesizes responses
-- **Worker Agents**: Specialized agents with different capabilities and MCP servers
-  - **WeatherAgent** (WORKER1): Weather forecasting and conditions
-  - **Worker2**: Social media monitoring (X/Twitter via MCP)
-  - **Worker3**: General purpose (configurable)
-- **JudgeAgent**: Evaluates worker outputs for quality, relevance, and accuracy
+Flub Agent is a simple, powerful travel planning assistant that uses Claude's native function calling with direct Python tool integration for flight search and other travel services.
 
-## Key Features
+### Key Features
 
-### 🎯 Intelligent Routing
-The orchestrator analyzes incoming messages and automatically routes them to the most appropriate worker agent(s).
+- **Single Agent Architecture**: One Claude agent with direct access to all tools
+- **No MCP Complexity**: Tools are simple Python functions - no servers to run
+- **Natural Tool Selection**: Claude automatically uses the right tools for each query
+- **Conversation Context**: Maintains history for multi-turn planning
+- **Easy to Extend**: Add new tools by creating Python functions
 
-### ⚡ Parallel Processing
-When multiple workers are needed, they process requests simultaneously for faster responses.
+## Quick Start
 
-### 🏆 Quality Evaluation
-The JudgeAgent automatically evaluates worker outputs and provides:
-- Individual scoring (relevance, accuracy, completeness, quality, coherence)
-- Comparative analysis between workers
-- Best response identification
-- Actionable recommendations
+### Prerequisites
+- Python 3.10+
+- An Anthropic API key
 
-### 💬 Conversation Context
-Maintains conversation history to provide context-aware responses.
+### Installation
 
-## Architecture
-
-```
-User Query
-    ↓
-OrchestratorAgent (routing)
-    ↓
-    ├→ WeatherAgent (WORKER1) ──┐
-    ├→ Worker2 ─────────────────┤
-    └→ Worker3 ─────────────────┤
-                                 ↓
-                          Worker Outputs
-                                 ↓
-                          JudgeAgent (evaluation)
-                                 ↓
-                          Synthesis & Response
-                                 ↓
-                            User Response
-```
-
-## Installation
-
-1. **Clone the repository**
+1. **Clone and navigate to the repository**
 ```bash
 cd flub-agent
 ```
 
-2. **Create and activate virtual environment**
-```bash
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-```
-
-3. **Install dependencies**
+2. **Install dependencies**
 ```bash
 pip install -r requirements.txt
 ```
 
-4. **Set up environment variables**
-Create a `.env` file in the project root:
+3. **Set up environment variables**
+Create a `.env` file:
 ```env
-DEDALUS_API_KEY=your_dedalus_api_key_here
-# or
-API_KEY=your_api_key_here
+ANTHROPIC_API_KEY=your_anthropic_api_key_here
+```
+
+4. **Run the agent**
+```bash
+python main.py
 ```
 
 ## Usage
@@ -81,297 +48,183 @@ API_KEY=your_api_key_here
 ### Basic Usage
 
 ```python
-import asyncio
-from orchestrator_agent import OrchestratorAgent
+from src.simple_agent import SimpleFlubAgent
 
-async def main():
-    orchestrator = OrchestratorAgent()
-    
-    # Simple query
-    response = await orchestrator.route_message(
-        "What's the weather like in Paris?"
-    )
-    print(response)
+# Create agent
+agent = SimpleFlubAgent()
 
-if __name__ == "__main__":
-    asyncio.run(main())
+# Ask a question
+response = agent.process("What's the cheapest flight from EWR to LAX on 2025-11-10?")
+print(response)
 ```
 
-### Using the JudgeAgent (Automatic Mode)
-
-The judge automatically evaluates worker outputs when multiple workers are used:
+### Multi-turn Conversation
 
 ```python
-orchestrator = OrchestratorAgent()
+agent = SimpleFlubAgent()
 
-# Judge is enabled by default
-# This will automatically trigger judge evaluation
-response = await orchestrator.route_message(
-    "What's the weather in NYC and are there any flight disruptions?"
-)
+# First query
+response1 = agent.process("Find flights from NYC to LA on December 1st")
+print(response1)
+
+# Follow-up with context
+response2 = agent.process("What's the cheapest option?")
+print(response2)
+
+# Clear history when done
+agent.clear_history()
 ```
-
-### Using the JudgeAgent (Explicit Mode)
-
-```python
-orchestrator = OrchestratorAgent()
-
-# Get explicit judge evaluation
-evaluation = await orchestrator.get_judge_evaluation(
-    message="Tell me about flying to Boston",
-    worker_names=["WORKER1", "WORKER2"]  # Optional: specify which workers
-)
-
-print(evaluation)
-```
-
-### Toggle Judge Evaluation
-
-```python
-orchestrator = OrchestratorAgent()
-
-# Disable judge
-orchestrator.toggle_judge(False)
-
-# Enable judge
-orchestrator.toggle_judge(True)
-
-# Toggle current state
-orchestrator.toggle_judge()  # Flips current state
-```
-
-### Standalone Judge Usage
-
-```python
-from workers import JudgeAgent
-
-judge = JudgeAgent()
-
-# Evaluate worker outputs
-worker_outputs = [
-    {
-        "worker_name": "WORKER1",
-        "output": "Weather response..."
-    },
-    {
-        "worker_name": "WORKER2",
-        "output": "Social media response..."
-    }
-]
-
-evaluation = await judge.evaluate_workers(
-    original_message="User's question",
-    worker_outputs=worker_outputs,
-    conversation_context="Previous conversation..."  # Optional
-)
-
-print(evaluation['evaluation'])
-```
-
-### Quick Assessment
-
-```python
-judge = JudgeAgent()
-
-# Fast pass/fail assessment
-quick_result = await judge.quick_assessment(
-    original_message="Is it safe to fly?",
-    worker_outputs=worker_outputs
-)
-print(quick_result)
-```
-
-### Conflict Detection
-
-```python
-judge = JudgeAgent()
-
-# Detect conflicts between worker responses
-conflicts = await judge.detect_conflicts(
-    worker_outputs=worker_outputs,
-    original_message="User's question"  # Optional
-)
-
-print(conflicts['conflict_analysis'])
-```
-
-## Configuration
-
-### Worker Configuration
-
-Edit `src/workers/browser_agent.py` to configure worker models and MCP servers:
-
-```python
-WORKER_CONFIGS = {
-    "worker1": {
-        "model": "openai/gpt-4.1",
-        "mcp_servers": [
-            "cathy-di/open-meteo-mcp"
-        ]
-    },
-    "worker2": {
-        "model": "xai/grok-2",
-        "mcp_servers": [
-            "bolaji/X-mcp"
-        ]
-    },
-    "worker3": {
-        "model": "xai/grok-3",
-        "mcp_servers": []
-    }
-}
-```
-
-### Orchestrator Configuration
-
-Edit `src/orchestrator_agent.py`:
-
-```python
-ORCHESTRATOR_AGENT_CONFIG = {
-    "model": "openai/gpt-4.1",
-    "mcp_servers": []
-}
-```
-
-### Judge Configuration
-
-Edit `src/workers/judge.py`:
-
-```python
-JUDGE_CONFIG = {
-    "model": "openai/gpt-4.1",  # Use high-quality model for evaluation
-    "mcp_servers": []  # Judge doesn't need MCP servers
-}
-```
-
-## Testing
-
-Run the comprehensive test suite:
-
-```bash
-# Run all tests
-python test_judge.py all
-
-# Run specific test
-python test_judge.py 1  # Toggle judge
-python test_judge.py 2  # Standalone judge
-python test_judge.py 3  # Quick assessment
-python test_judge.py 4  # Conflict detection
-python test_judge.py 5  # Explicit evaluation
-python test_judge.py 6  # Judge with orchestrator
-```
-
-## JudgeAgent Evaluation Criteria
-
-The judge evaluates responses based on five key criteria (scored 0-10):
-
-1. **Relevance**: How well the response addresses the original request
-2. **Accuracy**: Correctness and reliability of information
-3. **Completeness**: Coverage of all aspects of the request
-4. **Quality**: Soundness of reasoning and structure
-5. **Coherence**: Logical organization and clarity
-
-## Advanced Features
-
-### Conversation History Management
-
-```python
-orchestrator = OrchestratorAgent()
-
-# Process multiple messages with context
-await orchestrator.route_message("What's the weather in NYC?")
-await orchestrator.route_message("How about tomorrow?")  # Uses context
-
-# Clear history
-orchestrator.clear_history()
-```
-
-### Global Agent Instance
-
-```python
-from orchestrator_agent import get_global_agent, clear_conversation
-
-# Use persistent global agent (maintains history across calls)
-agent = get_global_agent()
-response = await agent.route_message("Hello")
-
-# Clear global conversation history
-clear_conversation()
-```
-
-## API Reference
-
-### OrchestratorAgent
-
-- `route_message(message: str) -> str`: Route and process a message
-- `get_judge_evaluation(message: str, worker_names: list = None) -> str`: Get explicit judge evaluation
-- `toggle_judge(enabled: bool = None) -> bool`: Enable/disable/toggle judge
-- `clear_history()`: Clear conversation history
-
-### JudgeAgent
-
-- `evaluate_workers(original_message, worker_outputs, conversation_context=None) -> Dict`: Comprehensive evaluation
-- `evaluate_single_response(original_message, response, worker_name, conversation_context=None) -> Dict`: Evaluate single response
-- `quick_assessment(original_message, worker_outputs, conversation_context=None) -> str`: Fast pass/fail assessment
-- `detect_conflicts(worker_outputs, original_message=None) -> Dict`: Detect conflicts between outputs
 
 ## Project Structure
 
 ```
 flub-agent/
 ├── src/
-│   ├── orchestrator_agent.py      # Main orchestrator
-│   └── workers/
+│   ├── simple_agent.py        # Main agent using Claude function calling
+│   └── tools/                 # Tool functions
 │       ├── __init__.py
-│       ├── browser_agent.py       # Base worker class
-│       ├── weather_agent.py       # Weather worker
-│       ├── worker2.py             # Social media worker
-│       ├── worker3.py             # General worker
-│       └── judge.py               # Judge agent
-├── test_judge.py                   # Comprehensive test suite
-├── requirements.txt                # Dependencies
-└── README.md                       # This file
+│       └── flight_search.py   # Flight search tools
+├── main.py                    # Main entry point
+├── requirements.txt           # Python dependencies
+├── .env                       # Environment variables (create this)
+└── README.md                  # This file
 ```
 
-## Best Practices
+## Architecture
 
-1. **Use Judge for Complex Queries**: Enable judge evaluation when you need quality assurance
-2. **Disable Judge for Speed**: Turn off judge for simple queries where evaluation isn't needed
-3. **Conversation Context**: Leverage conversation history for multi-turn interactions
-4. **Error Handling**: Workers return error messages rather than crashing
-5. **Configuration**: Customize models and MCP servers per worker for optimal performance
+```
+User Query
+    ↓
+SimpleFlubAgent (Claude with Function Calling)
+    │
+    ├─ Tool: search_flights()
+    ├─ Tool: find_best_price()
+    └─ Tool: [Add more tools...]
+    │
+    ↓
+Claude automatically selects and calls appropriate Python functions
+    ↓
+Unified Response
+```
+
+## Available Tools
+
+### Flight Search Tools
+
+**search_flights**
+- Search for flights between airports on a specific date
+- Parameters: date, from_airport, to_airport, adults, max_results
+- Returns: List of flights with pricing, duration, and details
+
+**find_best_price**
+- Find the cheapest flight for a route and date
+- Parameters: date, from_airport, to_airport, adults
+- Returns: Cheapest flight with price comparisons
+
+## Adding New Tools
+
+To add a new tool:
+
+1. **Create a tool file** in `src/tools/`:
+```python
+# src/tools/weather.py
+def get_weather(city: str, date: str):
+    """Get weather forecast for a city on a specific date."""
+    # Your implementation
+    return {"temperature": 72, "conditions": "sunny"}
+```
+
+2. **Export it** in `src/tools/__init__.py`:
+```python
+from .flight_search import search_flights, find_best_price
+from .weather import get_weather
+
+__all__ = ['search_flights', 'find_best_price', 'get_weather']
+```
+
+3. **Register it** in `src/simple_agent.py`:
+```python
+# Import the tool
+from tools import get_weather
+
+# Add to self.tools list
+self.tools.append({
+    "name": "get_weather",
+    "description": "Get weather forecast for a city on a specific date",
+    "input_schema": {
+        "type": "object",
+        "properties": {
+            "city": {"type": "string", "description": "City name"},
+            "date": {"type": "string", "description": "Date in YYYY-MM-DD format"}
+        },
+        "required": ["city", "date"]
+    }
+})
+
+# Add to _call_tool method
+def _call_tool(self, tool_name: str, tool_input: Dict[str, Any]):
+    if tool_name == "get_weather":
+        return get_weather(**tool_input)
+    # ... existing tools
+```
+
+That's it! No servers to run, no HTTP endpoints to configure.
+
+## API Reference
+
+### SimpleFlubAgent
+
+```python
+SimpleFlubAgent(api_key: Optional[str] = None)
+```
+
+**Methods:**
+- `process(message: str) -> str`: Process a message and return response
+- `clear_history()`: Clear conversation history
+
+## Examples
+
+See `main.py` for a working example:
+
+```python
+from datetime import datetime, timedelta
+from src.simple_agent import SimpleFlubAgent
+
+agent = SimpleFlubAgent()
+
+tomorrow = (datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d")
+response = agent.process(f"What is the best flight from EWR to LAX on {tomorrow}?")
+print(response)
+```
+
+## Environment Variables
+
+Required:
+- `ANTHROPIC_API_KEY`: Your Anthropic API key
 
 ## Troubleshooting
 
-### Judge Not Activating
-- Judge only activates automatically when multiple workers are used
-- Verify `orchestrator.use_judge = True`
-- Check that more than one worker is processing the message
-
 ### API Key Issues
-```python
-# Set in .env file
-DEDALUS_API_KEY=your_key_here
+Make sure `ANTHROPIC_API_KEY` is set in your `.env` file.
 
-# Or pass directly
-orchestrator = OrchestratorAgent(api_key="your_key")
+### Import Errors
+Make sure you're running from the project root:
+```bash
+cd /path/to/flub-agent
+python main.py
 ```
 
-### Worker Configuration
-- Ensure MCP servers are properly formatted in `WORKER_CONFIGS`
-- Use valid model identifiers (e.g., `openai/gpt-4.1`, `xai/grok-2`)
+### Tool Errors
+If a tool fails, check the error message in the response. The agent will report tool errors gracefully.
 
-## Contributing
+## Resources
 
-When adding new workers:
-1. Extend `BrowserAgent` class
-2. Add to `WORKER_CONFIGS` in `browser_agent.py`
-3. Import and initialize in `OrchestratorAgent`
-4. Update routing logic if needed
+- [Claude API Documentation](https://docs.anthropic.com)
+- [Function Calling Guide](https://docs.anthropic.com/en/docs/build-with-claude/tool-use)
 
 ## License
 
-[Your License Here]
+MIT License
 
 ## Support
 
