@@ -1,15 +1,14 @@
 from .browser_agent import BrowserAgent, WORKER_CONFIGS
 
-# Weather Worker 
-class Worker1(BrowserAgent):
-    
+# Weather Agent
+class WeatherAgent(BrowserAgent):
     def __init__(self, api_key: str = None):
+        # reuse the existing WORKER_CONFIGS key 'worker1' to keep configs unchanged
         super().__init__("worker1", api_key)
     
     async def process(self, message: str, conversation_context: str = None) -> str:
         """
-        Process message with Worker 1's specialized capabilities.
-        This system prompt is where we can enter the worker's specialization.
+        Process message with WeatherAgent's specialized capabilities.
         """
         system_prompt = """You are a specialized weather agent. Your primary role is to check weather conditions for specific dates and locations to help users plan their activities, especially flights.
 
@@ -46,5 +45,4 @@ Use your available tools to provide a comprehensive response that considers the 
             )
             return result.final_output
         except Exception as e:
-            return f"Error processing request in Worker 1: {str(e)}"
-
+            return f"Error processing request in WeatherAgent: {str(e)}"

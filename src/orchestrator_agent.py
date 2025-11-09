@@ -2,7 +2,7 @@ import asyncio
 import os
 from dedalus_labs import AsyncDedalus, DedalusRunner
 from dotenv import load_dotenv
-from workers import Worker1, Worker2, Worker3
+from workers import WeatherAgent, Worker2, Worker3
 
 load_dotenv()
 
@@ -41,7 +41,8 @@ class OrchestratorAgent:
         }
         
         # Initialize worker agents
-        self.worker1 = Worker1(api_key=self.api_key)
+        # keep attribute name `worker1` for backward compatibility with routing keys
+        self.worker1 = WeatherAgent(api_key=self.api_key)
         self.worker2 = Worker2(api_key=self.api_key)
         self.worker3 = Worker3(api_key=self.api_key)
     
