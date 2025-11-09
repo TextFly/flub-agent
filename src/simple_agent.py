@@ -14,7 +14,14 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Import our tools (after load_dotenv)
-from .tools import search_flights, find_best_price
+from .tools import (
+    search_flights, 
+    find_best_price,
+    search_user_tweets,
+    search_trending_topics,
+    search_topics,
+    analyze_tweet_sentiment
+)
 
 
 class SimpleFlubAgent:
@@ -96,6 +103,79 @@ class SimpleFlubAgent:
                     },
                     "required": ["date", "from_airport", "to_airport"]
                 }
+            },
+            {
+                "name": "search_user_tweets",
+                "description": "Search through the most recent tweets of a specific X/Twitter user. Returns user info and their recent tweets with engagement metrics.",
+                "input_schema": {
+                    "type": "object",
+                    "properties": {
+                        "username": {
+                            "type": "string",
+                            "description": "The X/Twitter username without @ symbol (e.g., 'elonmusk', 'united', 'delta')"
+                        },
+                        "max_results": {
+                            "type": "integer",
+                            "description": "Maximum number of tweets to return (default: 10, max: 100)",
+                            "default": 10
+                        }
+                    },
+                    "required": ["username"]
+                }
+            },
+            {
+                "name": "search_topics",
+                "description": "Search for tweets about specific topics or keywords on X/Twitter. Returns tweets matching the query with author info and engagement metrics. Useful for monitoring travel disruptions, delays, incidents.",
+                "input_schema": {
+                    "type": "object",
+                    "properties": {
+                        "query": {
+                            "type": "string",
+                            "description": "The search query or topic to search for (e.g., 'flight delays LAX', 'airport security JFK', 'United Airlines delays')"
+                        },
+                        "max_results": {
+                            "type": "integer",
+                            "description": "Maximum number of tweets to return (default: 10, max: 100)",
+                            "default": 10
+                        },
+                        "sort_order": {
+                            "type": "string",
+                            "description": "Sort order: 'recency' for newest first or 'relevancy' for most relevant",
+                            "enum": ["recency", "relevancy"],
+                            "default": "recency"
+                        }
+                    },
+                    "required": ["query"]
+                }
+            },
+            {
+                "name": "search_trending_topics",
+                "description": "Get current trending topics on X/Twitter for a specific location. Returns top trending hashtags and topics with tweet volumes.",
+                "input_schema": {
+                    "type": "object",
+                    "properties": {
+                        "woeid": {
+                            "type": "integer",
+                            "description": "Where On Earth ID for location. Common values: 1=Worldwide, 23424977=USA, 2459115=NYC, 2487956=San Francisco",
+                            "default": 1
+                        }
+                    },
+                    "required": []
+                }
+            },
+            {
+                "name": "analyze_tweet_sentiment",
+                "description": "Analyze engagement metrics and sentiment from tweet search results. Takes the output from search_topics or search_user_tweets and provides aggregated statistics.",
+                "input_schema": {
+                    "type": "object",
+                    "properties": {
+                        "tweets_data": {
+                            "type": "object",
+                            "description": "The complete output from search_topics or search_user_tweets functions"
+                        }
+                    },
+                    "required": ["tweets_data"]
+                }
             }
         ]
 
@@ -105,6 +185,14 @@ class SimpleFlubAgent:
             return search_flights(**tool_input)
         elif tool_name == "find_best_price":
             return find_best_price(**tool_input)
+        elif tool_name == "search_user_tweets":
+            return search_user_tweets(**tool_input)
+        elif tool_name == "search_topics":
+            return search_topics(**tool_input)
+        elif tool_name == "search_trending_topics":
+            return search_trending_topics(**tool_input)
+        elif tool_name == "analyze_tweet_sentiment":
+            return analyze_tweet_sentiment(**tool_input)
         else:
             return {"error": f"Unknown tool: {tool_name}"}
 
@@ -157,12 +245,16 @@ CRITICAL RULES - FOLLOW EXACTLY:
    - Calculate relative dates: "tomorrow" = day after {current_date}, "next Friday" = calculate from {current_date}
    - NEVER call search tools for past dates
 
-3. WHAT YOU CAN DO:
-   - Search flights between airports (future dates only)
-   - Find best prices
-   - Compare options
-
-4. WHAT YOU CANNOT DO:
+ 3. WHAT YOU CAN DO:
+    - Search flights between airports (future dates only)
+    - Find best prices
+    - Compare options
+    - Check X/Twitter for travel disruptions and delays
+    - Monitor airline accounts for updates
+    - Search trending travel topics
+    - Analyze social media sentiment about travel issues
+ 
+ 4. WHAT YOU CANNOT DO:
    - Book flights (you only search)
    - Process payments
    - Access existing reservations
@@ -182,9 +274,16 @@ American 234 at 8am - $289 (nonstop, 5h 20m)
 Delta 567 at 11am - $305 (nonstop, 5h 15m)
 United 890 at 3pm - $275 (1 stop, 7h 45m)
 
-The United flight is cheapest but has a stop. American is a good balance of price and convenience."
-
-Remember: Plain text only. No markdown. No emojis. Check dates before searching.""",
+ The United flight is cheapest but has a stop. American is a good balance of price and convenience."
+ 
+ 6. USING X/TWITTER TOOLS:
+    - Use search_topics to find tweets about "flight delays [airport]", "airline issues", etc.
+    - Use search_user_tweets to check @united, @delta, @americanair for updates
+    - Use search_trending_topics to see what's trending related to travel
+    - When reporting X findings, keep it brief: "Checked X - no major delays reported" or "FYI, people on X are reporting long security lines at LAX"
+    - Don't overuse X tools - only when user asks about disruptions or you think it's relevant
+ 
+ Remember: Plain text only. No markdown. No emojis. Check dates before searching.""",
                 messages=self.conversation_history,
                 tools=self.tools
             )
